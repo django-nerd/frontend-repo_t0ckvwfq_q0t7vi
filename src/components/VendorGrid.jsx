@@ -1,5 +1,9 @@
+import { useState } from 'react'
+import VendorProfile from './VendorProfile'
+
 export default function VendorGrid({ vendors = {}, title = 'Recommended Vendors' }) {
   const keys = Object.keys(vendors)
+  const [openId, setOpenId] = useState(null)
   return (
     <section id="vendors" className="py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -16,19 +20,20 @@ export default function VendorGrid({ vendors = {}, title = 'Recommended Vendors'
               <h3 className="font-semibold text-rose-600 mb-3 capitalize">{cat}</h3>
               <div className="space-y-3">
                 {(vendors[cat] || []).map((v) => (
-                  <div key={v._id} className="flex gap-3">
+                  <button key={v._id} onClick={()=>setOpenId(v._id)} className="flex gap-3 text-left w-full">
                     <img src={v.images?.[0] || 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=400'} alt={v.name} className="h-16 w-16 rounded-lg object-cover border" />
                     <div>
                       <p className="font-semibold text-slate-900">{v.name}</p>
                       <p className="text-sm text-slate-600">{v.city || v.region} • {v.price_tier}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
           ))}
         </div>
       </div>
+      <VendorProfile vendorId={openId} onClose={()=>setOpenId(null)} />
     </section>
   )
 }

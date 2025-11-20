@@ -4,6 +4,7 @@ import Hero from './components/Hero'
 import PlannerForm from './components/PlannerForm'
 import VendorGrid from './components/VendorGrid'
 import PlanSummary from './components/PlanSummary'
+import AssistantChat from './components/AssistantChat'
 
 function App() {
   const [planData, setPlanData] = useState(null)
@@ -37,6 +38,7 @@ function App() {
         </section>
 
         <VendorGrid vendors={planData?.vendors} />
+        <AssistantChat />
 
         <section id="contact" className="py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
