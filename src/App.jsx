@@ -1,71 +1,55 @@
+import { useEffect, useState } from 'react'
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import PlannerForm from './components/PlannerForm'
+import VendorGrid from './components/VendorGrid'
+import PlanSummary from './components/PlanSummary'
+
 function App() {
+  const [planData, setPlanData] = useState(null)
+  const backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+
+  useEffect(() => {
+    // Seed vendors once at start (idempotent)
+    fetch(`${backend}/api/seed/vendors`, { method: 'POST' }).catch(() => {})
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_50%)]"></div>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-fuchsia-50 to-rose-100">
+      <Navbar />
+      <main>
+        <Hero onStart={() => {
+          const el = document.getElementById('planner')
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }} />
 
-      <div className="relative min-h-screen flex items-center justify-center p-8">
-        <div className="max-w-2xl w-full">
-          {/* Header with Flames icon */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center mb-6">
-              <img
-                src="/flame-icon.svg"
-                alt="Flames"
-                className="w-24 h-24 drop-shadow-[0_0_25px_rgba(59,130,246,0.5)]"
-              />
+        <section id="planner" className="py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">Tell us about your dream wedding</h2>
+              <p className="text-slate-700 mb-6">We’ll tailor a regional plan with an Arabic timeline, budget split and curated vendors.</p>
+              <PlannerForm onPlan={(data) => setPlanData(data)} />
             </div>
-
-            <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
-              Flames Blue
-            </h1>
-
-            <p className="text-xl text-blue-200 mb-6">
-              Build applications through conversation
-            </p>
-          </div>
-
-          {/* Instructions */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-8 shadow-xl mb-6">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                1
-              </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1">Describe your idea</h3>
-                <p className="text-blue-200/80 text-sm">Use the chat panel on the left to tell the AI what you want to build</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1">Watch it build</h3>
-                <p className="text-blue-200/80 text-sm">Your app will appear in this preview as the AI generates the code</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="font-semibold text-white mb-1">Refine and iterate</h3>
-                <p className="text-blue-200/80 text-sm">Continue the conversation to add features and make changes</p>
-              </div>
+            <div>
+              <PlanSummary data={planData} />
             </div>
           </div>
+        </section>
 
-          {/* Footer */}
-          <div className="text-center">
-            <p className="text-sm text-blue-300/60">
-              No coding required • Just describe what you want
-            </p>
+        <VendorGrid vendors={planData?.vendors} />
+
+        <section id="contact" className="py-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 shadow grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">White‑glove concierge</h3>
+                <p className="text-slate-700">Our team can negotiate packages with top venues and vendors across Lebanon, GCC and Egypt.</p>
+              </div>
+              <a href="/test" className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-rose-500 to-fuchsia-600 px-6 py-3 text-white font-semibold shadow-lg text-center">Check Backend Status</a>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   )
 }
