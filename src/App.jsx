@@ -6,10 +6,12 @@ import VendorGrid from './components/VendorGrid'
 import PlanSummary from './components/PlanSummary'
 import AssistantChat from './components/AssistantChat'
 import AuthModal from './components/AuthModal'
+import MyPlans from './components/MyPlans'
 
 function App() {
   const [planData, setPlanData] = useState(null)
   const [authOpen, setAuthOpen] = useState(false)
+  const [plansOpen, setPlansOpen] = useState(false)
   const [user, setUser] = useState(null)
   const backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 
@@ -26,8 +28,13 @@ function App() {
     }
   }, [])
 
+  const ensureAuth = () => {
+    if (!user) { setAuthOpen(true); return false }
+    return true
+  }
+
   const savePlan = async () => {
-    if (!user) { setAuthOpen(true); return }
+    if (!ensureAuth()) return
     const token = localStorage.getItem('token')
     if (!token || !planData) return
     const res = await fetch(`${backend}/api/plans`, {
@@ -58,10 +65,11 @@ function App() {
               <h2 className="text-2xl font-bold text-slate-900 mb-3">Tell us about your dream wedding</h2>
               <p className="text-slate-700 mb-6">We’ll tailor a regional plan with an Arabic timeline, budget split and curated vendors.</p>
               <PlannerForm onPlan={(data) => setPlanData(data)} />
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 flex flex-wrap gap-3 items-center">
                 <button onClick={savePlan} className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-rose-500 to-fuchsia-600 px-6 py-3 text-white font-semibold shadow-lg">Save Plan</button>
+                <button onClick={() => { if (ensureAuth()) setPlansOpen(true) }} className="inline-flex items-center justify-center rounded-xl border border-rose-200 text-rose-600 px-5 py-3 font-medium bg-white/70">My Plans</button>
                 {user ? (
-                  <span className="text-slate-600 text-sm self-center">Signed in as {user.email}</span>
+                  <span className="text-slate-600 text-sm">Signed in as {user.email}</span>
                 ) : (
                   <button onClick={()=>setAuthOpen(true)} className="text-rose-600 font-medium">Sign in</button>
                 )}
@@ -92,6 +100,12 @@ function App() {
         fetch(`${backend}/auth/me`, { headers: { Authorization: `Bearer ${token}` }})
           .then(r=>r.json()).then(setUser).catch(()=>{})
       }} />
+      <MyPlans
+        open={plansOpen}
+        onClose={()=>setPlansOpen(false)}
+        onOpenPlan={(data)=> setPlanData(data)}
+        backendBase={backend}
+      />
     </div>
   )
 }
